@@ -13,6 +13,12 @@ class TeamController {
     const teams = await this.teamService.getAllTeams();
     res.status(statusCodes.ok).json(teams);
   };
+
+  public getTeamById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const team = await this.teamService.getTeamById(Number(id));
+    res.status(statusCodes.ok).json(team);
+  };
 }
 
 export default TeamController;
