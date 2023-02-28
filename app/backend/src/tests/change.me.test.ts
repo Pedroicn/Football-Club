@@ -6,7 +6,9 @@ import chaiHttp = require('chai-http');
 import { app } from '../app';
 // import Example from '../database/models/ExampleModel';
 import TeamModel from '../database/models/TeamModel';
+import UserModel from '../database/models/UserModel';
 import { Response } from 'superagent';
+
 
 chai.use(chaiHttp);
 
@@ -55,6 +57,7 @@ describe('Testing route /teams', () => {
   // });
 });
 
+
 describe('Testing route /teams/:id', () => {
   /**
    * Exemplo do uso de stubs com tipos
@@ -87,4 +90,45 @@ describe('Testing route /teams/:id', () => {
   // });
 });
 
+describe('Testing route /login', () => {
+ 
+  const mockUser = {
+    id: 1,
+    username: "Pedro",
+    role: "user",
+    password: "secret_user",
+    email: "user@user.com",
+  }
 
+  const mockLogin = {
+    email: 'user@user.com', 
+    password:'secret_user'
+  };
+  
+  let chaiHttpResponse: Response;
+
+  beforeEach(async () => {
+    sinon
+      .stub(UserModel, "findOne")
+      .resolves(mockUser as UserModel);
+  });
+
+  afterEach(() => {
+    (UserModel.findOne as sinon.SinonStub).restore();
+  });
+
+  it('Tests login user with correct params', async () => {
+   
+    chaiHttpResponse = await chai
+      .request(app)
+      .post('/login').send(mockLogin)
+    expect(chaiHttpResponse.status).to.be.equal(200);
+    expect(chaiHttpResponse.body).not.to.be.empty;
+    expect(chaiHttpResponse.body).to.haveOwnProperty('token');
+
+  });
+
+  // it('Seu sub-teste', () => {
+  //   expect(false).to.be.eq(true);
+  // });
+});
