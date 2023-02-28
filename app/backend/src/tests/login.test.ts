@@ -51,4 +51,22 @@ describe('Testing route /login', () => {
 
   });
 
+  it('test login without email in the parameter', async () => {
+   
+    chaiHttpResponse = await chai
+      .request(app)
+      .post('/login').send({ password:'secret_user' })
+    expect(chaiHttpResponse.status).to.be.equal(400);
+
+    expect(chaiHttpResponse.body.message).to.be.equal("All fields must be filled");
+
+  });
+
+  it('test login without password in the parameter', async () => {
+    chaiHttpResponse = await chai
+       .request(app).post('/login').send({ email: 'user@user.com' });
+    expect(chaiHttpResponse.status).to.be.equal(400);
+    expect(chaiHttpResponse.body.message).to.be.equal('All fields muts be filled');
+  });
+
 });
