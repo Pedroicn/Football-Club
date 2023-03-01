@@ -20,7 +20,7 @@ describe('Testing route /login', () => {
     id: 1,
     username: "Pedro",
     role: "user",
-    password: "secret_user",
+    password: "$2a$08$Y8Abi8jXvsXyqm.rmp0B.uQBA5qUz7T6Ghlg/CvVr/gLxYj5UAZVO",
     email: "user@user.com",
   }
 
@@ -38,7 +38,8 @@ describe('Testing route /login', () => {
   });
 
   afterEach(() => {
-    (UserModel.findOne as sinon.SinonStub).restore();
+    // (UserModel.findOne as sinon.SinonStub).restore();
+    sinon.restore();
   });
 
   it('Tests login user with correct params', async () => {
@@ -67,7 +68,7 @@ describe('Testing route /login', () => {
     chaiHttpResponse = await chai
        .request(app).post('/login').send({ email: 'user@user.com' });
     expect(chaiHttpResponse.status).to.be.equal(400);
-    expect(chaiHttpResponse.body.message).to.be.equal('All fields muts be filled');
+    expect(chaiHttpResponse.body.message).to.be.equal('All fields must be filled');
   });
 
 });
@@ -129,6 +130,19 @@ describe('Testing route /login with incorrect params', () => {
       .post('/login').send({
         email: 'pedro@test.com',
         password: 'secret_user',
+      })
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
+    expect(chaiHttpResponse.body.message).to.be.equal('Invalid email or password');
+
+  });
+
+  it('Tests loginUser with password in the correct format but is not registered', async () => {
+  
+    chaiHttpResponse = await chai
+      .request(app)
+      .post('/login').send({
+        email: 'user@user.com',
+        password: '12345678',
       })
     expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
     expect(chaiHttpResponse.body.message).to.be.equal('Invalid email or password');

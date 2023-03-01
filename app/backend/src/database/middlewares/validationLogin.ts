@@ -6,6 +6,12 @@ export const validationEmail = (req: Request, res: Response, next: NextFunction)
   if (!email) {
     return res.status(statusCodes.badRequest).json({ message: 'All fields must be filled' });
   }
+
+  const validEmail = /\S+@\S+\.\S+/i.test(email);
+
+  if (!validEmail) {
+    return res.status(statusCodes.unauthorized).json({ message: 'Invalid email or password' });
+  }
   next();
 };
 
@@ -13,6 +19,10 @@ export const validationPassword = (req: Request, res: Response, next: NextFuncti
   const { password } = req.body;
   if (!password) {
     return res.status(statusCodes.badRequest).json({ message: 'All fields must be filled' });
+  }
+
+  if (password.length < 6) {
+    return res.status(statusCodes.unauthorized).json({ message: 'Invalid email or password' });
   }
   next();
 };

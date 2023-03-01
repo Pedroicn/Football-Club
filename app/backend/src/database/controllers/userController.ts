@@ -18,6 +18,9 @@ class UserController {
       role: user?.role,
       email: user?.email,
     };
+    if (user === null) {
+      return res.status(statusCodes.unauthorized).json({ message: 'Invalid email or password' });
+    }
     const token = generateToken(newUser);
     res.status(statusCodes.ok).json({ token });
   };
