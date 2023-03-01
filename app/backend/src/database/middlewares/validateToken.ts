@@ -17,7 +17,6 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
   } catch (error) {
     res.status(statusCodes.unauthorized).json({ message: 'Token must be a valid token' });
   }
-  next();
 };
 
 export default validateToken;
