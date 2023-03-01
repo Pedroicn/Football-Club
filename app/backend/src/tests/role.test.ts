@@ -44,4 +44,14 @@ describe('Testing route get /login/role', () => {
     expect(chaiHttpResponse.body.message).to.be.equal('Token not found');
   });
 
+  it('tests that it is not possible to return an object with a invalid token', async () => {
+    
+    chaiHttpResponse = await chai.request(app).get('/login/role')
+    .set({authorization: 'INVALID_TOKEN'});
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
+    expect(chaiHttpResponse.body.message).to.be
+    .equal('Token must be a valid token');
+  });
+
 });
