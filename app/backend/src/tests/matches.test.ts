@@ -88,13 +88,7 @@ describe('Testing route /matches', () => {
   ]
 
   let chaiHttpResponse: Response;
-
-  // beforeEach(async () => {
-  //   sinon
-  //     .stub(MatchModel, "findAll")
-  //     .resolves(expectedReturn as mock[]);
-  // });
-
+  
   afterEach(() => {
     sinon.restore();
   });
@@ -226,6 +220,76 @@ describe('Testing route /matches/:id', () => {
       .resolves();
 
     chaiHttpResponse = await chai.request(app).patch('/matches/2')
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
+
+    expect(chaiHttpResponse.body.message).to.be.equal("Token not found");
+  });
+
+
+});
+
+describe('Testing route /matches with method post to create match', () => {
+
+  let chaiHttpResponse: Response;
+
+  afterEach(() => {
+    sinon.restore();
+  });
+  
+  // it('Tests if a match was created with a valid token', async () => {
+  //   sinon
+  //     .stub(MatchModel, "create")
+  //     .resolves();
+
+  //   const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJVc2VyIiwicm9sZSI6InVzZXIiLCJlbWFpbCI6InVzZXJAdXNlci5jb20iLCJpYXQiOjE2Nzc3Njc3MzR9.LwGoTmw2tSlGOAkcZjSaoe4Es-uvZlSvR-ZkxyLQs-4';
+
+  //   chaiHttpResponse = await chai.request(app).post('/matches')
+  //   .send({
+  //     homeTeamId: 16,
+  //     awayTeamId: 8,
+  //     homeTeamGoals: 2,
+  //     awayTeamGoals: 2
+  //   })
+  //   .set({authorization: validToken});
+    
+  //   expect(chaiHttpResponse.status).to.be.equal(statusCodes.created);
+
+  //   expect(chaiHttpResponse.body.message).to.be.deep.equal({
+  //     id: 49,
+  //     homeTeamId: 16,
+  //     awayTeamId: 8,
+  //     homeTeamGoals: 2,
+  //     awayTeamGoals: 2,
+  //     inProgress: true
+  //   });
+  // });
+
+  it('Tests if there is an error in the route /matches with invalid token', async () => {
+    sinon
+      .stub(MatchModel, "create")
+      .resolves();
+
+    chaiHttpResponse = await chai.request(app).post('/matches')
+    .send({
+      homeTeamId: 16,
+      awayTeamId: 8,
+      homeTeamGoals: 2,
+      awayTeamGoals: 2
+    })
+    .set({authorization: 'INVALID_TOKEN'});
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
+
+    expect(chaiHttpResponse.body.message).to.be.equal("Token must be a valid token");
+  });
+
+  it('Tests if there is an error in the route /matches with no token', async () => {
+    sinon
+      .stub(MatchModel, "create")
+      .resolves();
+
+    chaiHttpResponse = await chai.request(app).post('/matches')
     
     expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
 
