@@ -10,4 +10,6 @@ router.get('/matches', matchController.getAllMatches);
 
 router.patch('/matches/:id/finish', validateToken, matchController.finishMatches);
 
+router.patch('/matches/:id', validateToken, matchController.updateMatch);
+
 export default router;

@@ -2,6 +2,11 @@ import statusCodes from '../../utils/statusCodes';
 import MatchModel from '../models/MatchModel';
 import Team from '../models/TeamModel';
 
+interface Body {
+  homeTeamGoals: 3,
+  awayTeamGoals: 1
+}
+
 class MatchService {
   private matchModel = MatchModel;
 
@@ -30,6 +35,15 @@ class MatchService {
       where: { id },
     });
     return { code: statusCodes.ok, message: { message: 'Finished' } };
+  }
+
+  public async updateMatch(id: number, body: Body) {
+    await this.matchModel.update({
+      homeTeamGoals: body.homeTeamGoals,
+      awayTeamGoals: body.awayTeamGoals,
+    }, { where: { id } });
+
+    return { code: statusCodes.ok, message: { message: 'Updated' } };
   }
 }
 export default MatchService;
