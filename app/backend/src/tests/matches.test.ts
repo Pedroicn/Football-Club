@@ -111,16 +111,67 @@ describe('Testing route /matches', () => {
     expect(chaiHttpResponse.body).to.be.deep.equal(expectedReturn);
   });
 
-  it.only('Tests if get all matches in progress', async () => {
+  it('Tests if get all matches in progress', async () => {
     sinon
       .stub(MatchModel, "findAll")
       .resolves(mockInProgressTrue as mock[]);
     
-    chaiHttpResponse = await chai.request(app).get('/matches?inProgress=true');
+    chaiHttpResponse = await chai.request(app).get('/matches?inProgress=false');
     
     expect(chaiHttpResponse.status).to.be.equal(statusCodes.ok);
 
     expect(chaiHttpResponse.body).to.be.deep.equal(mockInProgressTrue);
   });
+
+});
+
+describe('Testing route /matches/:id/finish', () => {
+
+  let chaiHttpResponse: Response;
+
+  afterEach(() => {
+    sinon.restore();
+  });
+  
+  it('Tests if a match is finished', async () => {
+    sinon
+      .stub(MatchModel, "update")
+      .resolves();
+
+    const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJVc2VyIiwicm9sZSI6InVzZXIiLCJlbWFpbCI6InVzZXJAdXNlci5jb20iLCJpYXQiOjE2Nzc3Njc3MzR9.LwGoTmw2tSlGOAkcZjSaoe4Es-uvZlSvR-ZkxyLQs-4';
+
+    chaiHttpResponse = await chai.request(app).patch('/matches/43/finish')
+    .set({authorization: validToken});
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.ok);
+
+    expect(chaiHttpResponse.body.message).to.be.equal("Finished");
+  });
+
+  it('Tests route finish with invalid token', async () => {
+    sinon
+      .stub(MatchModel, "update")
+      .resolves();
+
+    chaiHttpResponse = await chai.request(app).patch('/matches/43/finish')
+    .set({authorization: 'INVALID_TOKEN'});
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
+
+    expect(chaiHttpResponse.body.message).to.be.equal("Token must be a valid token");
+  });
+
+  it('Tests route finish without a token', async () => {
+    sinon
+      .stub(MatchModel, "update")
+      .resolves();
+
+    chaiHttpResponse = await chai.request(app).patch('/matches/43/finish')
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
+
+    expect(chaiHttpResponse.body.message).to.be.equal("Token not found");
+  });
+
 
 });
