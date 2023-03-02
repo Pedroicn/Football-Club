@@ -175,3 +175,62 @@ describe('Testing route /matches/:id/finish', () => {
 
 
 });
+
+describe('Testing route /matches/:id', () => {
+
+  let chaiHttpResponse: Response;
+
+  afterEach(() => {
+    sinon.restore();
+  });
+  
+  it('Tests if a match was uptdated', async () => {
+    sinon
+      .stub(MatchModel, "update")
+      .resolves();
+
+    const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJVc2VyIiwicm9sZSI6InVzZXIiLCJlbWFpbCI6InVzZXJAdXNlci5jb20iLCJpYXQiOjE2Nzc3Njc3MzR9.LwGoTmw2tSlGOAkcZjSaoe4Es-uvZlSvR-ZkxyLQs-4';
+
+    chaiHttpResponse = await chai.request(app).patch('/matches/2')
+    .send({
+      homeTeamGoals: 3,
+      awayTeamGoals: 1
+    })
+    .set({authorization: validToken});
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.ok);
+
+    expect(chaiHttpResponse.body.message).to.be.equal("Updated");
+  });
+
+  it('Tests route /matches/:id with invalid token', async () => {
+    sinon
+      .stub(MatchModel, "update")
+      .resolves();
+
+    chaiHttpResponse = await chai.request(app).patch('/matches/2')
+    .send({
+      homeTeamGoals: 3,
+      awayTeamGoals: 1
+    })
+    .set({authorization: 'INVALID_TOKEN'});
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
+
+    expect(chaiHttpResponse.body.message).to.be.equal("Token must be a valid token");
+  });
+
+  it('Tests route /matches/:id without a token', async () => {
+    sinon
+      .stub(MatchModel, "update")
+      .resolves();
+
+    chaiHttpResponse = await chai.request(app).patch('/matches/2')
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
+
+    expect(chaiHttpResponse.body.message).to.be.equal("Token not found");
+  });
+
+
+});
