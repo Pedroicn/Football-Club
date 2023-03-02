@@ -7,6 +7,7 @@ import { app } from '../app';
 
 import MatchModel from '../database/models/MatchModel';
 import { Response } from 'superagent';
+import statusCodes from '../utils/statusCodes';
 
 
 chai.use(chaiHttp);
@@ -14,6 +15,15 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Testing route /matches', () => {
+
+  interface mock extends MatchModel {
+    homeTeam: {
+      teamName: string;
+    },
+    awayTeam: {
+      teamName: string;
+    }      
+  }
 
   const expectedReturn = [
     {
@@ -46,43 +56,25 @@ describe('Testing route /matches', () => {
     }
   ]
 
-  const mockMatches = [
-    {
-      id: 1,
-      homeTeamId: 16,
-      homeTeamGoals: 1,
-      awayTeamId: 8,
-      awayTeamGoals: 1,
-      inProgress: false,
-    },
-    {
-      id: 41,
-      homeTeamId: 16,
-      homeTeamGoals: 2,
-      awayTeamId: 9,
-      awayTeamGoals: 0,
-      inProgress: true,
-    }
-  ]
-
-
   let chaiHttpResponse: Response;
 
   beforeEach(async () => {
     sinon
       .stub(MatchModel, "findAll")
-      .resolves(mockMatches as MatchModel[]);
+      .resolves(expectedReturn as mock[]);
   });
 
   afterEach(() => {
     sinon.restore();
   });
   
-  it('Tests if get all all matches', async () => {
+  it.only('Tests if get all all matches', async () => {
     
     chaiHttpResponse = await chai.request(app).get('/matches');
     
-    expect(chaiHttpResponse.status).to.be.equal(200);
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.ok);
+
+    expect(chaiHttpResponse.body).to.be.deep.equal(expectedReturn);
   });
 
 });
