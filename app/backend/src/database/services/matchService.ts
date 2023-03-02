@@ -1,3 +1,4 @@
+import statusCodes from '../../utils/statusCodes';
 import MatchModel from '../models/MatchModel';
 import Team from '../models/TeamModel';
 
@@ -14,7 +15,6 @@ class MatchService {
       );
       return matches;
     }
-    console.log(inProgress);
     const matches = await this.matchModel.findAll(
       { where: { inProgress },
         include: [
@@ -23,6 +23,13 @@ class MatchService {
         ] },
     );
     return matches;
+  }
+
+  public async finishMatch(id: number) {
+    await this.matchModel.update({ inProgress: false }, {
+      where: { id },
+    });
+    return { code: statusCodes.ok, message: { message: 'Finished' } };
   }
 }
 export default MatchService;

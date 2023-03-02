@@ -16,9 +16,14 @@ class MatchController {
       return res.status(statusCodes.ok).json(matches);
     }
     const bool = inProgress === 'true';
-    // console.log(bool);
     const matches = await this.matchService.getAllMatches(bool);
     return res.status(statusCodes.ok).json(matches);
+  };
+
+  public finishMatches = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { code, message } = await this.matchService.finishMatch(+id);
+    return res.status(code).json(message);
   };
 }
 
