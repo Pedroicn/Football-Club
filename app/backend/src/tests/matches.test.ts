@@ -4,8 +4,8 @@ import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-
 import MatchModel from '../database/models/MatchModel';
+import TeamModel from '../database/models/TeamModel';
 import { Response } from 'superagent';
 import statusCodes from '../utils/statusCodes';
 
@@ -13,6 +13,8 @@ import statusCodes from '../utils/statusCodes';
 chai.use(chaiHttp);
 
 const { expect } = chai;
+
+const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJVc2VyIiwicm9sZSI6InVzZXIiLCJlbWFpbCI6InVzZXJAdXNlci5jb20iLCJpYXQiOjE2Nzc3Njc3MzR9.LwGoTmw2tSlGOAkcZjSaoe4Es-uvZlSvR-ZkxyLQs-4';
 
 describe('Testing route /matches', () => {
 
@@ -183,8 +185,6 @@ describe('Testing route /matches/:id', () => {
       .stub(MatchModel, "update")
       .resolves();
 
-    const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJVc2VyIiwicm9sZSI6InVzZXIiLCJlbWFpbCI6InVzZXJAdXNlci5jb20iLCJpYXQiOjE2Nzc3Njc3MzR9.LwGoTmw2tSlGOAkcZjSaoe4Es-uvZlSvR-ZkxyLQs-4';
-
     chaiHttpResponse = await chai.request(app).patch('/matches/2')
     .send({
       homeTeamGoals: 3,
@@ -236,11 +236,21 @@ describe('Testing route /matches with method post to create match', () => {
   afterEach(() => {
     sinon.restore();
   });
+
+  const mockMatchCreated = {
+    id: 49,
+    homeTeamId: 1,
+    awayTeamId: 8,
+    homeTeamGoals: 2,
+    awayTeamGoals: 2,
+    inProgress: true
+  }
   
   // it('Tests if a match was created with a valid token', async () => {
+  //   sinon.stub(TeamModel, 'findOne').resolves()
   //   sinon
   //     .stub(MatchModel, "create")
-  //     .resolves();
+  //     .resolves(mockMatchCreated as MatchModel);
 
   //   const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJVc2VyIiwicm9sZSI6InVzZXIiLCJlbWFpbCI6InVzZXJAdXNlci5jb20iLCJpYXQiOjE2Nzc3Njc3MzR9.LwGoTmw2tSlGOAkcZjSaoe4Es-uvZlSvR-ZkxyLQs-4';
 
@@ -294,6 +304,40 @@ describe('Testing route /matches with method post to create match', () => {
     expect(chaiHttpResponse.status).to.be.equal(statusCodes.unauthorized);
 
     expect(chaiHttpResponse.body.message).to.be.equal("Token not found");
+  });
+
+  it('Tests if there is an error in the route /matches with the same teams in the req', async () => {
+    sinon
+      .stub(MatchModel, "create")
+      .resolves();
+
+    chaiHttpResponse = await chai.request(app).post('/matches').send({
+      homeTeamId: 8,
+      awayTeamId: 8,
+      homeTeamGoals: 2,
+      awayTeamGoals: 2,
+    }).set({ authorization: validToken })
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.unprocessable);
+
+    expect(chaiHttpResponse.body.message).to.be.equal('It is not possible to create a match with two equal teams');
+  });
+
+  it('Tests if there is an error in the route /matches in case one of the teams doesnt exist in the database', async () => {
+    sinon
+      .stub(MatchModel, "create")
+      .resolves();
+
+    chaiHttpResponse = await chai.request(app).post('/matches').send({
+      homeTeamId: 100,
+      awayTeamId: 8,
+      homeTeamGoals: 2,
+      awayTeamGoals: 2,
+    }).set({ authorization: validToken })
+    
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.notFound);
+
+    expect(chaiHttpResponse.body.message).to.be.equal('There is no team with such id!');
   });
 
 
