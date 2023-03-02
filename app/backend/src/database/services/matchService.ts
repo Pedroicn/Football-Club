@@ -7,6 +7,13 @@ interface Body {
   awayTeamGoals: 1
 }
 
+interface IcreateMatch {
+  homeTeamId: 16,
+  awayTeamId: 8,
+  homeTeamGoals: 2,
+  awayTeamGoals: 2,
+}
+
 class MatchService {
   private matchModel = MatchModel;
 
@@ -44,6 +51,14 @@ class MatchService {
     }, { where: { id } });
 
     return { code: statusCodes.ok, message: { message: 'Updated' } };
+  }
+
+  public async createMatch(body: IcreateMatch) {
+    const matchData = await this.matchModel.create({
+      ...body,
+      inProgress: true,
+    });
+    return { code: statusCodes.created, message: matchData };
   }
 }
 export default MatchService;
