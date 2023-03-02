@@ -7,7 +7,7 @@ interface Body {
   awayTeamGoals: 1
 }
 
-interface IcreateMatch {
+export interface IcreateMatch {
   homeTeamId: 16,
   awayTeamId: 8,
   homeTeamGoals: 2,
@@ -16,6 +16,7 @@ interface IcreateMatch {
 
 class MatchService {
   private matchModel = MatchModel;
+  private teamModel = Team;
 
   public async getAllMatches(inProgress?: boolean): Promise<MatchModel[]> {
     if (inProgress === undefined) {
@@ -54,10 +55,21 @@ class MatchService {
   }
 
   public async createMatch(body: IcreateMatch) {
+    const homeTeam = await this.teamModel.findOne({
+      where: { id: body.homeTeamId },
+    });
+    const awayTeam = await this.teamModel.findOne({
+      where: { id: body.awayTeamId },
+    });
+    if (homeTeam === null || awayTeam === null) {
+      return { code: statusCodes.notFound, message: { message: 'There is no team with such id!' } };
+    }
+
     const matchData = await this.matchModel.create({
       ...body,
       inProgress: true,
     });
+    console.log(matchData);
     return { code: statusCodes.created, message: matchData };
   }
 }
