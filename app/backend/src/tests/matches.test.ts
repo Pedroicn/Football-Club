@@ -239,41 +239,40 @@ describe('Testing route /matches with method post to create match', () => {
 
   const mockMatchCreated = {
     id: 49,
-    homeTeamId: 1,
+    homeTeamId: 16,
     awayTeamId: 8,
     homeTeamGoals: 2,
     awayTeamGoals: 2,
     inProgress: true
   }
   
-  // it('Tests if a match was created with a valid token', async () => {
-  //   sinon.stub(TeamModel, 'findOne').resolves()
-  //   sinon
-  //     .stub(MatchModel, "create")
-  //     .resolves(mockMatchCreated as MatchModel);
+  it('Tests if a match was created with a valid token', async () => {
 
-  //   const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJVc2VyIiwicm9sZSI6InVzZXIiLCJlbWFpbCI6InVzZXJAdXNlci5jb20iLCJpYXQiOjE2Nzc3Njc3MzR9.LwGoTmw2tSlGOAkcZjSaoe4Es-uvZlSvR-ZkxyLQs-4';
+    sinon
+      .stub(MatchModel, "create")
+      .resolves(mockMatchCreated as MatchModel);
 
-  //   chaiHttpResponse = await chai.request(app).post('/matches')
-  //   .send({
-  //     homeTeamId: 16,
-  //     awayTeamId: 8,
-  //     homeTeamGoals: 2,
-  //     awayTeamGoals: 2
-  //   })
-  //   .set({authorization: validToken});
+    const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJVc2VyIiwicm9sZSI6InVzZXIiLCJlbWFpbCI6InVzZXJAdXNlci5jb20iLCJpYXQiOjE2Nzc3Njc3MzR9.LwGoTmw2tSlGOAkcZjSaoe4Es-uvZlSvR-ZkxyLQs-4';
+
+    chaiHttpResponse = await chai.request(app).post('/matches')
+    .send({
+      homeTeamId: 16,
+      awayTeamId: 8,
+      homeTeamGoals: 2,
+      awayTeamGoals: 2
+    })
+    .set({authorization: validToken});
     
-  //   expect(chaiHttpResponse.status).to.be.equal(statusCodes.created);
-
-  //   expect(chaiHttpResponse.body.message).to.be.deep.equal({
-  //     id: 49,
-  //     homeTeamId: 16,
-  //     awayTeamId: 8,
-  //     homeTeamGoals: 2,
-  //     awayTeamGoals: 2,
-  //     inProgress: true
-  //   });
-  // });
+    expect(chaiHttpResponse.status).to.be.equal(statusCodes.created);
+    expect(chaiHttpResponse.body).to.be.deep.equal({
+      id: 49,
+      homeTeamId: 16,
+      awayTeamId: 8,
+      homeTeamGoals: 2,
+      awayTeamGoals: 2,
+      inProgress: true
+    });
+  });
 
   it('Tests if there is an error in the route /matches with invalid token', async () => {
     sinon

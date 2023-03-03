@@ -15,8 +15,8 @@ export interface IcreateMatch {
 }
 
 class MatchService {
-  private matchModel = MatchModel;
-  private teamModel = Team;
+  public matchModel = MatchModel;
+  public teamModel = Team;
 
   public async getAllMatches(inProgress?: boolean): Promise<MatchModel[]> {
     if (inProgress === undefined) {
@@ -69,7 +69,6 @@ class MatchService {
       ...body,
       inProgress: true,
     });
-    console.log(matchData);
     return { code: statusCodes.created, message: matchData };
   }
 }
