@@ -15,7 +15,6 @@ class LeaderBoardController {
     const finishedMatches = await this.leaderBoardService.getFinishedMatches();
     const allTeams = await this.teamService.getAllTeams();
     const board = LeaderBoardService.createBoard(allTeams, finishedMatches);
-    console.log(board);
     res.status(statusCodes.ok).json(board);
   };
 }
