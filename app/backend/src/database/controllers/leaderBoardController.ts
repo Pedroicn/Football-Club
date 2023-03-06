@@ -11,10 +11,11 @@ class LeaderBoardController {
     this.leaderBoardService = new LeaderBoardService();
   }
 
-  public getFinishedMatches = async (_req: Request, res: Response) => {
+  public getFinishedMatches = async (req: Request, res: Response) => {
+    const side = (req.path).split('/')[2];
     const finishedMatches = await this.leaderBoardService.getFinishedMatches();
     const allTeams = await this.teamService.getAllTeams();
-    const board = LeaderBoardService.createBoard(allTeams, finishedMatches);
+    const board = LeaderBoardService.createBoard(allTeams, finishedMatches, side);
     res.status(statusCodes.ok).json(board);
   };
 }

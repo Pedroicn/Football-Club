@@ -93,7 +93,7 @@ describe('Testing route /leaderboard/home', () => {
       goalsFavor: 2,
       goalsOwn: 0,
       goalsBalance: 2,
-      efficiency: "100.00"
+      efficiency: 100
     },
     {
       name: "Santos",
@@ -105,7 +105,7 @@ describe('Testing route /leaderboard/home', () => {
       goalsFavor: 0,
       goalsOwn: 2,
       goalsBalance: -2,
-      efficiency: "0.00"
+      efficiency: 0
     },
   ]
 
